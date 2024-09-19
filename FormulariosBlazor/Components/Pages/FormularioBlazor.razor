@@ -1,0 +1,130 @@
+﻿@page "/productos"
+@using System.ComponentModel.DataAnnotations
+
+
+<h1>Formularios Blazor</h1>
+
+<EditForm Model="producto" OnValidSubmit="@GuardarProducto">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <div class="row">
+            <div class="col offset-2">
+                <!--Nombre del producto -->
+                <div class="form-group">
+                    <label for="nombre">Nombre del producto:</label>
+                    <InputText id="nombre" @bind-Value="producto.Nombre" class="form-control" placeholder="Ingresa el nombre"></InputText>
+                </div>
+                <!-- Descripcion -->
+                <div class="form-group">
+                    <label for="descripcion">Descripcion del producto:</label>
+                    <InputTextArea id="descripcion" @bind-Value="producto.Descripcion" class="form-control" placeholder="Ingresa la descripción"></InputTextArea>
+                </div>
+                <!-- Precio -->
+                <div class="form-group">
+                    <label for="precio">Precio del producto:</label>
+                    <InputNumber id="precio" @bind-Value="producto.Precio" class="form-control"></InputNumber>
+                </div>
+                <!-- Cantidad -->
+                <div class="form-group">
+                    <label for="cantidad">Cantidad del producto:</label>
+                    <InputNumber id="cantidad" @bind-Value="producto.Cantidad" class="form-control"></InputNumber>
+                </div>
+                <!-- Fecha de lanzamiento -->
+                <div class="form-group">
+                    <label for="fecha">Fecha de lanzamiento:</label>
+                    <InputDate id="fecha" @bind-Value="producto.FechaLanzamiento" class="form-control"></InputDate>
+                </div>
+                <!--Categoría -->
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <InputSelect id="categoria" @bind-Value="producto.Categoria" class="form-control">
+                        <option value="">Seleccionar una categoría</option>
+                        <option value="Electronica">Electrónica</option>
+                        <option value="Ropa">Ropa</option>
+                        <option value="Hogar">Hogar</option>
+                    </InputSelect>
+                </div>
+                  <!-- Disponible -->
+                <div class="form-group">
+                    <label for="fecha">Disponible:</label>
+                    <InputCheckbox id="disponible" @bind-Value="producto.Disponible"/>
+                </div>
+                <!-- URL de la imagen-->
+                <div class="form-group">
+                    <label for="imagen">URL de la imagen:</label>
+                    <InputText id="imagen" @bind-Value="producto.ImagenUrl" class="form-control" placeholder="Ingresa la url de la imagen"></InputText>
+                </div>
+                <!-- Subida de archivo -->
+                <div>
+                    <label for="archivo">Subir archivo (imagen):</label>
+                    <InputFile OnChange="SubirArchivo" class="form-control">
+                        @if (!string.IsNullOrEmpty(producto.NombreArchivo))
+                        {
+                            <p>Archivo cargado: @producto.NombreArchivo</p>
+                        }
+                    </InputFile>
+                </div>
+                <br/>
+                <button type="submit" class="btn btn-primary">Guardar Producto</button>
+          
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private Producto producto = new Producto();
+    private IBrowserFile archivoSubido;
+    private async Task SubirArchivo(InputFileChangeEventArgs e)
+    {
+        archivoSubido = e.File;
+        var buffer = new Byte[archivoSubido.Size];
+        await archivoSubido.OpenReadStream().ReadAsync(buffer);
+
+        //Guardar archivo (simulación, puedes cambiarlo por lógica real)
+        producto.NombreArchivo = archivoSubido.Name;
+
+        //Aquí puedes guardar el archivo en el servidor o procesarlo según lo requieras.
+    }
+
+    private void GuardarProducto()
+    {
+        //Lógica para guardar el producto
+        Console.WriteLine("Producto guardado con éxito");
+    }
+
+
+    public class Producto
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; }
+
+        public string Descripcion { get; set; }
+        [Range(0.01, 9999.99, ErrorMessage = "El precio debe de estar entre 0.0.1 y 9999.99")]
+        public decimal Precio { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "La cantidad  en stock debe ser entre 0 y 1000")]
+        public int Cantidad { get; set; }
+
+        public DateTime FechaLanzamiento { get; set; }
+
+        [Required(ErrorMessage = "Debe de seleccionar una categoría")]
+        public string Categoria { get; set; }
+
+        public bool Disponible { get; set; }
+
+        [Url(ErrorMessage = "Debe proporcionar una URL válida")]
+        public string ImagenUrl { get; set; }
+
+        //Propiedad para almacenar el nombre del archivo subido
+        public string NombreArchivo { get; set; }
+
+        
+
+       
+    }
+
+    
+}
